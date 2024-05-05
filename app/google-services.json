@@ -1,0 +1,29 @@
+{
+  "project_info": {
+    "project_number": "591308378886",
+    "project_id": "kotlintagram",
+    "storage_bucket": "kotlintagram.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:591308378886:android:b21f2d201f5c6e308d8487",
+        "android_client_info": {
+          "package_name": "com.beyzaterzioglu.kotlintagram"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyDA4fXr1s2XoZU8dnE4HWLx8fbkaQzEjFQ"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
