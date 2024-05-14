@@ -69,7 +69,7 @@
         android:layout_marginStart="15dp"
         android:layout_marginTop="15dp"
         android:src="@drawable/person"
-        app:civ_border_color="#FF4081"
+        
         app:civ_border_width="2dp"
         app:layout_constraintDimensionRatio="1:1"
         app:layout_constraintEnd_toStartOf="@id/edit_profile_btn"

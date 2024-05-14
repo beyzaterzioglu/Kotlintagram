@@ -2,10 +2,13 @@
 
 package com.beyzaterzioglu.kotlintagram.fragments
 
+import android.Manifest
 import android.annotation.SuppressLint
 import android.app.Activity
 import android.app.ProgressDialog
+import android.content.Context
 import android.content.Intent
+import android.content.pm.PackageManager
 import android.graphics.Bitmap
 import android.net.Uri
 import android.os.Bundle
@@ -17,7 +20,10 @@ import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import android.widget.Toast
+import androidx.activity.result.ActivityResultLauncher
+import androidx.activity.result.contract.ActivityResultContracts
 import androidx.appcompat.app.AlertDialog
+import androidx.core.content.ContextCompat
 import androidx.databinding.DataBindingUtil
 import androidx.lifecycle.Observer
 import androidx.lifecycle.ViewModelProvider
@@ -34,7 +40,7 @@ import java.util.ArrayList
 import java.util.UUID
 
 
-@Suppress("DEPRECATION")
+
 class CreatePostFragment : Fragment() {
     private lateinit var binding : FragmentCreatePostBinding
     private lateinit var pd: ProgressDialog
@@ -57,8 +63,41 @@ class CreatePostFragment : Fragment() {
         // Inflate the layout for this fragment
         binding = DataBindingUtil.inflate(inflater, R.layout.fragment_create_post, container, false)
 
+        handleCameraPermission()
         return binding.root
 
+    }
+
+    private val cameraPermissionRequestLauncher: ActivityResultLauncher<String> =
+        registerForActivityResult(ActivityResultContracts.RequestPermission()) { isGranted: Boolean ->
+            if (isGranted) {
+                // Permission granted: proceed with opening the camera
+                //startDefaultCamera()
+            } else {
+                // Permission denied: inform the user to enable it through settings
+                Toast.makeText(
+                    requireContext(),
+                    "Go to settings and enable camera permission to use this feature",
+                    Toast.LENGTH_SHORT
+                ).show()
+            }
+        }
+
+    fun handleCameraPermission() {
+        when {
+            ContextCompat.checkSelfPermission(
+                requireContext(),
+                Manifest.permission.CAMERA
+            ) == PackageManager.PERMISSION_GRANTED -> {
+                // Permission is already granted: start the camera
+                //startDefaultCamera()
+            }
+
+            else -> {
+                // Permission is not granted: request it
+                cameraPermissionRequestLauncher.launch(Manifest.permission.CAMERA)
+            }
+        }
     }
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
@@ -167,9 +206,10 @@ class CreatePostFragment : Fragment() {
         }
     }
 
-    // To take a photo with the camera, you can use this code
+
     @SuppressLint("QueryPermissionsNeeded")
     private fun takePhotoWithCamera() {
+
 
         val takePictureIntent = Intent(MediaStore.ACTION_IMAGE_CAPTURE)
         startActivityForResult(takePictureIntent, Utils.REQUEST_IMAGE_CAPTURE)

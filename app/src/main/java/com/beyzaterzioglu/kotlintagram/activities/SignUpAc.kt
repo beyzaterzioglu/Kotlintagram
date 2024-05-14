@@ -44,7 +44,7 @@ class SignUpAc : AppCompatActivity() {
                 val name=binding.signUpName.text.toString()
                 signUp(name,email,password)
             }
-            if(binding.signUpnetemail.text.isNotEmpty() || binding.signUpetpassword.text.isNotEmpty())
+            if(binding.signUpnetemail.text.isEmpty() || binding.signUpetpassword.text.isEmpty() || binding.signUpName.text.isEmpty())
             {
 
                 Toast.makeText(this,"Devam etmek için boşlukları doldurunuz.", Toast.LENGTH_SHORT).show()
@@ -60,7 +60,7 @@ class SignUpAc : AppCompatActivity() {
             {
                 val user=auth.currentUser
                 //varsayılan değerler
-                val hashMap= hashMapOf("userid" to user!!.uid,"image" to "https://upload.wikimedia.org/wikipedia/en/b/bd/Doraemon_character.png", //default resim link eklencek buraya,
+                val hashMap= hashMapOf("userid" to user!!.uid,"username" to name,"image" to "https://upload.wikimedia.org/wikipedia/en/b/bd/Doraemon_character.png", //default resim link eklencek buraya,
                     "email" to email,"followers" to 0,"following" to 0 )
 
                 firestore.collection("Users").document(user.uid).set(hashMap)

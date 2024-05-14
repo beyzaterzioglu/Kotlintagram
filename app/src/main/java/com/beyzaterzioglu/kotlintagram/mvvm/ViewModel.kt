@@ -45,9 +45,12 @@ fun getCurrentUser()=viewModelScope.launch(Dispatchers.IO) {
     }
 }
     // Kullanıcının gönderilerini almak için Firestore'dan sorgu yapma işlemi
+
     fun getMyPost(): LiveData<List<Posts>> {
         val posts = MutableLiveData<List<Posts>>()
         val firestore = FirebaseFirestore.getInstance()
+
+        //background thread
 
         viewModelScope.launch(Dispatchers.IO) {
             try {
@@ -79,5 +82,38 @@ fun getCurrentUser()=viewModelScope.launch(Dispatchers.IO) {
 
         // LiveData'nın sonucunu döndür
         return posts
+    }
+
+    fun getAllUsers():LiveData<List<Users>>{
+
+        val users= MutableLiveData<List<Users>>()
+        val firestore=FirebaseFirestore.getInstance()
+
+        viewModelScope.launch(Dispatchers.IO) {
+            try {
+                firestore.collection("Users").addSnapshotListener{value,error ->
+                    if(error!=null){
+                        return@addSnapshotListener
+                    }
+                    val userList= mutableListOf<Users>()
+                    value?.documents?.forEach { document ->
+                        val user = document.toObject(Users::class.java)
+
+                        if(user!=null && user.userid!=Utils.getUiLoggedIn())
+                        {
+                            //user boş değilse ve girişi yapılmış kişi değilse göster
+                            userList.add(user)
+                        }
+                    }
+                    users.postValue(userList)
+                }
+            }
+            catch (e: Exception){
+
+
+            }
+        }
+
+        return users
     }
 }

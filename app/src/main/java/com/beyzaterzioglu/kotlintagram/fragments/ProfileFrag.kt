@@ -1,3 +1,5 @@
+@file:Suppress("DEPRECATION")
+
 package com.beyzaterzioglu.kotlintagram.fragments
 
 import android.annotation.SuppressLint
@@ -95,11 +97,11 @@ class ProfileFrag : Fragment() {
 
         }
         binding.addPost.setOnClickListener {
-            // add post tuşuna tıklayınca createpostfragment'e gider.
+
 
             view.findNavController().navigate(R.id.action_profileFrag_to_createPostFragment)
-        }
 
+        }
         vm.name.observe(viewLifecycleOwner, Observer {
                 it->
 
@@ -289,8 +291,9 @@ class ProfileFrag : Fragment() {
 
         binding.addPost.setOnClickListener { // yeni gönderi ekleme ekranına gönderir.
 
-            view.findNavController().navigate(R.id.action_profileFrag_to_createPostFragment)
 
+
+           view.findNavController().navigate(R.id.action_profileFrag_to_createPostFragment)
         }
 
 
