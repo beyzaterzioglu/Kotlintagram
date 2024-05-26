@@ -47,6 +47,7 @@ class UserToFollowFragment : Fragment(),OnFriendClicked {
         }
 
         vm.getAllUsers().observe(viewLifecycleOwner,Observer{
+            //takip edilen kişileri listeler.
             adapter.setUserList(it)
             binding.rvFollow.adapter=adapter
         })
@@ -57,6 +58,7 @@ class UserToFollowFragment : Fragment(),OnFriendClicked {
 
 
     override fun onfriendListener(position: Int, user: Users) {
+        //birisi takip edildiğinde followUser fonksiyonu çağırılır.
         adapter.followUser(user)
     }
 

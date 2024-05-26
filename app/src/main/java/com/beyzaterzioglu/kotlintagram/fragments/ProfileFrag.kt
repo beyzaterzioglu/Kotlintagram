@@ -158,8 +158,6 @@ class ProfileFrag : Fragment() {
                 Glide.with(requireContext()).load(it).into(imageView)
 
 
-
-
             })
 
 
@@ -173,7 +171,6 @@ class ProfileFrag : Fragment() {
                 .setTitle("Edit Profile")
                 .setView(customView)
                 .setPositiveButton("Done") { dialog, which ->
-                    // Handle OK button click
                     val inputText = editText.text.toString()
 
                     // Firestore'daki kullanıcı belgesinin güncellenmesi

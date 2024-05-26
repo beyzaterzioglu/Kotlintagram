@@ -1,10 +1,12 @@
 package com.beyzaterzioglu.kotlintagram.mvvm
 
+import android.util.Log
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.beyzaterzioglu.kotlintagram.Utils
+import com.beyzaterzioglu.kotlintagram.modal.Comments
 import com.beyzaterzioglu.kotlintagram.modal.Feed
 import com.beyzaterzioglu.kotlintagram.modal.Posts
 import com.beyzaterzioglu.kotlintagram.modal.Users
@@ -21,6 +23,8 @@ class ViewModel:ViewModel() {
     val image = MutableLiveData<String>()
     val followers = MutableLiveData<String>()
     val following = MutableLiveData<String>()
+    val postId = MutableLiveData<String>()
+    val userId = MutableLiveData<String>()
 
     init {
         //viewmodel oluşunca fonskiyonu çağırır
@@ -91,12 +95,12 @@ fun getCurrentUser()=viewModelScope.launch(Dispatchers.IO) {
         val firestore=FirebaseFirestore.getInstance()
 
         viewModelScope.launch(Dispatchers.IO) {
-            try {
+            try { //Users koleksiyonunu dinlemeye başlar. bi hata alınırsa if kısmına gelir.
                 firestore.collection("Users").addSnapshotListener{value,error ->
-                    if(error!=null){
+                    if(error!=null){ //hata alındı
                         return@addSnapshotListener
                     }
-                    val userList= mutableListOf<Users>()
+                    val userList= mutableListOf<Users>() //Users lsitesini tutacak.
                     value?.documents?.forEach { document ->
                         val user = document.toObject(Users::class.java)
 
@@ -160,9 +164,12 @@ fun getCurrentUser()=viewModelScope.launch(Dispatchers.IO) {
         return feeds
     }
 
+
+
+    // Takip edilen kişileri listeliyor.
     fun getThePeopleIfollow(callback:(List<String>)-> Unit){
         val firestore=FirebaseFirestore.getInstance()
-        val ifollowlist= mutableListOf<String>()
+        val ifollowlist= mutableListOf<String>() //ID'lerin tutulacağı liste
 
         ifollowlist.add(Utils.getUiLoggedIn())
 
@@ -170,12 +177,13 @@ fun getCurrentUser()=viewModelScope.launch(Dispatchers.IO) {
 
             docsnap->
             if(docsnap.exists())
-               {
+               {// Eğer belge mevcutsa
                 val followingids=docsnap.get("following_id") as? List<String>
                    val updateList=followingids?.toMutableList()?: mutableListOf()
 
                    ifollowlist.addAll(updateList)
 
+                   //takip edilen kişilerin ID'leri ile çağırılır.
                    callback(ifollowlist)
 
                  }
@@ -183,6 +191,9 @@ fun getCurrentUser()=viewModelScope.launch(Dispatchers.IO) {
             {
                 callback(ifollowlist)
             }
+
+            //docsnap, Firestore'dan belge alındığında bu belgeyi temsil eden bir nesnedir
+        // ve bu belgeye erişim sağlar. Bu nesne üzerinden belgeyle ilgili işlemler yapılır.
         }
     }
 }
