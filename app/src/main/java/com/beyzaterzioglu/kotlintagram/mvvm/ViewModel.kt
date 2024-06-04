@@ -17,7 +17,7 @@ import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 
 class ViewModel:ViewModel() {
-
+    private val comments = MutableLiveData<List<Comments>>()
 
     val name = MutableLiveData<String>()
     val image = MutableLiveData<String>()
@@ -25,10 +25,18 @@ class ViewModel:ViewModel() {
     val following = MutableLiveData<String>()
     val postId = MutableLiveData<String>()
     val userId = MutableLiveData<String>()
+    val commentId=MutableLiveData<String>()
 
     init {
         //viewmodel oluşunca fonskiyonu çağırır
         getCurrentUser()
+    }
+    fun getAllComments(): LiveData<List<Comments>> {
+        // Yorumları veritabanından veya başka bir kaynaktan alarak comments LiveData'sını güncelleyin
+        return comments
+    }
+    fun setComments(newComments: List<Comments>) {
+        comments.value = newComments
     }
 fun getCurrentUser()=viewModelScope.launch(Dispatchers.IO) {
     // Kullanıcı verilerini almak için Firestore'dan sorgu yapma işlemi

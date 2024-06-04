@@ -27,6 +27,9 @@
         <action
             android:id="@+id/action_homeFrag_to_profileFrag"
             app:destination="@id/profileFrag" />
+        <action
+            android:id="@+id/action_homeFrag_to_fragment_fullcomments"
+            app:destination="@id/fragment_fullcomments" />
     </fragment>
     <fragment
         android:id="@+id/createPostFragment"
@@ -43,5 +46,13 @@
         <action
             android:id="@+id/action_userToFollowFragment_to_profileFrag"
             app:destination="@id/profileFrag" />
+    </fragment>
+    <fragment
+        android:id="@+id/fragment_fullcomments"
+        android:name="com.beyzaterzioglu.kotlintagram.fragments.UserToFollowFragment"
+        android:label="FullCommentsFrag" >
+        <action
+            android:id="@+id/action_fragment_fullcomments_to_homeFrag"
+            app:destination="@id/homeFrag" />
     </fragment>
 </navigation>

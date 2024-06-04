@@ -1,12 +1,11 @@
 <?xml version="1.0" encoding="utf-8"?>
 <androidx.cardview.widget.CardView xmlns:android="http://schemas.android.com/apk/res/android"
-    android:layout_width="match_parent"
     xmlns:app="http://schemas.android.com/apk/res-auto"
-    android:orientation="vertical"
-    app:cardCornerRadius="8dp"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
     android:layout_margin="10dp"
     android:layout_weight="1"
-    android:layout_height="wrap_content"
+    app:cardCornerRadius="8dp"
     app:cardElevation="8dp">
 
     <LinearLayout
@@ -14,130 +13,129 @@
         android:layout_height="wrap_content"
         android:orientation="vertical">
 
-
-    <FrameLayout
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content">
-
-        <ImageView
-            android:layout_width="match_parent"
-            android:layout_height="280dp"
-            android:id="@+id/feedImage"
-            android:src="@drawable/image_placeholder"/>
-
-        <RelativeLayout
+        <FrameLayout
             android:layout_width="match_parent"
             android:layout_height="wrap_content">
 
-            <de.hdodenhof.circleimageview.CircleImageView
-                android:layout_width="50dp"
-                android:layout_height="50dp"
-                android:src="@mipmap/ic_launcher"
-                android:layout_margin="10dp"
-                app:civ_border_color="#FF4081"
-                app:civ_border_width="1dp"
-                android:id="@+id/userimage"/>
+            <ImageView
+                android:id="@+id/feedImage"
+                android:layout_width="match_parent"
+                android:layout_height="280dp"
+                android:src="@drawable/image_placeholder" />
+
+            <RelativeLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content">
+
+                <de.hdodenhof.circleimageview.CircleImageView
+                    android:id="@+id/userimage"
+                    android:layout_width="50dp"
+                    android:layout_height="50dp"
+                    android:layout_marginStart="10dp"
+                    android:layout_marginTop="10dp"
+                    android:layout_marginEnd="10dp"
+                    android:layout_marginBottom="10dp"
+                    android:src="@mipmap/ic_launcher"
+                    app:civ_border_color="#FF4081"
+                    app:civ_border_width="1dp" />
+
+                <TextView
+                    android:id="@+id/feedtopusername"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_centerVertical="true"
+                    android:layout_margin="5dp"
+                    android:layout_toRightOf="@id/userimage"
+                    android:text="username"
+                    android:textColor="@color/black"
+                    android:textSize="18sp"
+                    android:textStyle="bold" />
+
+            </RelativeLayout>
+
+        </FrameLayout>
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="horizontal"
+            android:weightSum="2">
 
             <TextView
-                android:layout_width="wrap_content"
+                android:id="@+id/likecount"
+                android:layout_width="0dp"
                 android:layout_height="wrap_content"
-                android:text="username"
-                android:layout_toRightOf="@id/userimage"
-                android:layout_centerVertical="true"
-                android:id="@+id/feedtopusername"
-                android:textSize="18sp"
-                android:layout_margin="5dp"
+                android:layout_gravity="center_vertical"
+                android:layout_margin="12dp"
+                android:layout_weight="1"
+                android:text="0 Likes"
+                android:textColor="@color/black"
+                android:textStyle="bold" />
+
+
+            <Button
+                android:id="@+id/commentbutton"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_gravity="center_vertical"
+                android:layout_margin="12dp"
+                android:layout_weight="1"
+                android:background="@color/white"
+                android:onClick="onCommentButtonClick"
+                android:text="Add Comment"
+                android:textColor="@color/black"
                 android:textStyle="bold"
-                android:textColor="@color/black"/>
-
-        </RelativeLayout>
-
-    </FrameLayout>
+                app:backgroundTint="@color/white" />
 
 
-
-
-
-
-<LinearLayout
-    android:layout_width="match_parent"
-    android:layout_height="wrap_content"
-    android:orientation="horizontal"
-    android:weightSum="2">
-
-    <TextView
-        android:id="@+id/likecount"
-        android:layout_width="5dp"
-        android:layout_height="wrap_content"
-        android:layout_gravity="center_vertical"
-        android:layout_margin="12dp"
-        android:layout_weight="1"
-        android:text="0 Likes"
-        android:textColor="@color/black"
-        android:textStyle="bold" />
-
-
-    <Button
-        android:id="@+id/commentbutton"
-        android:layout_width="13dp"
-        android:background="@color/white"
-        android:layout_height="wrap_content"
-        android:layout_gravity="center_vertical"
-        app:backgroundTint="@color/white"
-        android:layout_margin="12dp"
-        android:layout_weight="1"
-        android:text=" Add Comment"
-        android:textColor="@color/black"
-        android:onClick="onCommentButtonClick"
-        android:textStyle="bold" />
-</LinearLayout>
+        </LinearLayout>
 
         <TextView
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
             android:id="@+id/feedusernamecaption"
-            android:textSize="18sp"
-            android:text="username"
-            android:layout_margin="10dp"
-            android:textColor="@color/black"/>
-
-
-        <TextView
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:text="time"
-            android:textSize="16sp"
-            android:id="@+id/feedtime"
             android:layout_margin="10dp"
-            android:textStyle="bold"
-            android:textColor="@color/black"/>
+            android:text="username"
+            android:textColor="@color/black"
+            android:textSize="18sp" />
 
+        <TextView
+            android:id="@+id/feedtime"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_margin="10dp"
+            android:text="time"
+            android:textColor="@color/black"
+            android:textSize="16sp"
+            android:textStyle="bold" />
 
         <LinearLayout
             android:id="@+id/commentsSection"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:orientation="vertical"
-            android:padding="16dp"
-            app:layout_constraintTop_toBottomOf="@id/feed_recycler"
-            app:layout_constraintBottom_toTopOf="@id/linearLayout">
+            android:padding="16dp">
 
             <androidx.recyclerview.widget.RecyclerView
                 android:id="@+id/commentsRecycler"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:layout_marginTop="16dp"/>
+                android:layout_marginTop="16dp" />
+
         </LinearLayout>
 
-
-
+        <TextView
+            android:id="@+id/showItem"
+            android:layout_width="match_parent"
+            android:layout_height="40dp"
+            android:layout_margin="12dp"
+            android:background="@color/white"
+            android:onClick="AllCommentButtonClick"
+            android:text="Show All Comments"
+            android:textColor="@color/black"
+            android:textStyle="bold"
+            android:clickable="true"
+            app:backgroundTint="@color/white" />
     </LinearLayout>
-
-
-
-
-
-
-
 
 </androidx.cardview.widget.CardView>

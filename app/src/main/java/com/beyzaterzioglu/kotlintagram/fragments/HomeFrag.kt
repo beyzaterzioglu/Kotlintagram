@@ -9,6 +9,7 @@ import android.view.View
 import android.view.ViewGroup
 import android.widget.Button
 import android.widget.EditText
+import android.widget.TextView
 import androidx.appcompat.app.AlertDialog
 import androidx.databinding.DataBindingUtil
 import androidx.lifecycle.Observer
@@ -48,6 +49,7 @@ class HomeFrag : Fragment(), onDoubleTappyClickListener {
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
         val addCommentButton = view.findViewById<Button>(R.id.buttonAddComment)
+        val addSubCommentButton = view.findViewById<Button>(R.id.answerCommentButton)
         val commentEditText = view.findViewById<EditText>(R.id.editTextComment)
 
         adapter = MyFeedAdapter().apply {
@@ -74,6 +76,11 @@ class HomeFrag : Fragment(), onDoubleTappyClickListener {
         adapter.onCommentClickListener = {
             showAddCommentDialog(it)
         }
+       adapter.onSubCommentClickListener ={
+            showAddCommentDialog(it)
+        }
+
+
 
         binding.backButton.setOnClickListener {
             view.findNavController().navigate(R.id.action_homeFrag_to_profileFrag)
@@ -87,16 +94,19 @@ class HomeFrag : Fragment(), onDoubleTappyClickListener {
             Glide.with(requireContext()).load(it).into(binding.imageViewBottom)
         })
 
+        addSubCommentButton?.setOnClickListener {
+            val commentText=commentEditText.text.toString()
+            addSubComment(vm.postId.value?: " ",vm.commentId.value?: " ", Comments(vm.userId.value ?: "", vm.name.value?: " ", commentText))
+        }
         addCommentButton?.setOnClickListener {
             val commentText = commentEditText.text.toString()
             // Yorum ekleme fonksiyonunu çağırın
-            addComment(vm.postId.value ?: "", Comments(vm.userId.value ?: "", "UserName", commentText))
+            addComment(vm.postId.value ?: "", Comments(vm.userId.value ?: "", vm.name.value?: " ", commentText))
         }
 
         // Yorumlar RecyclerView'u ve Adapter'i ayarlayın
 
-        // Post ID'yi alın ve yorumları yükleyin (örnek bir post ID kullanıyorum)
-        val postId = "examplePostId"
+
     }
 
     private fun showAddCommentDialog(postId: String) {
@@ -108,10 +118,11 @@ class HomeFrag : Fragment(), onDoubleTappyClickListener {
 
         builder.setPositiveButton("Gönder") { dialog, _ ->
             val commentText = input.text.toString()
+            val userName=vm.name.value
             if (commentText.isNotEmpty()) {
                 val comment = Comments(
                     userid = Utils.getUiLoggedIn(),
-                    userName = "UserName", // Kullanıcı adını alın
+                    userName = userName.toString(), // Kullanıcı adını alın
                     commentText = commentText
                 )
                 addComment(postId, comment)
@@ -178,9 +189,9 @@ class HomeFrag : Fragment(), onDoubleTappyClickListener {
 
     fun addSubComment(postId: String, commentId : String, comment: Comments) {
         val firestore = FirebaseFirestore.getInstance()
-        val commentRef = firestore.collection("Posts").document(postId).collection("comments").document(commentId).collection("subcomments").document()
+        val subCommentRef = firestore.collection("Posts").document(postId).collection("comments").document(commentId).collection("subcomments").document()
 
-        commentRef.set(comment)
+        subCommentRef.set(comment)
             .addOnSuccessListener {
                 Log.d("AddComment", "Comment added successfully")
             }
@@ -194,5 +205,11 @@ class HomeFrag : Fragment(), onDoubleTappyClickListener {
         }
         startActivity(intent)
     }
+    fun onSubCommentButtonClick(feed: Feed) {
+        val intent = Intent(activity, CommentsActivity::class.java).apply {
+            putExtra("postId", feed.postid)
 
+        }
+        startActivity(intent)
+    }
 }

@@ -8,6 +8,8 @@ import android.widget.LinearLayout
 import android.widget.TextView
 import androidx.appcompat.app.AlertDialog
 import androidx.appcompat.app.AppCompatActivity
+import androidx.lifecycle.LiveData
+import androidx.lifecycle.MutableLiveData
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import com.beyzaterzioglu.kotlintagram.R
@@ -16,6 +18,7 @@ import com.beyzaterzioglu.kotlintagram.adapter.CommentsAdapter
 import com.beyzaterzioglu.kotlintagram.modal.Comments
 import com.google.firebase.firestore.FirebaseFirestore
 import com.google.firebase.firestore.Query
+import kotlinx.coroutines.Dispatchers
 
 class CommentsActivity : AppCompatActivity() {
 
@@ -27,6 +30,7 @@ class CommentsActivity : AppCompatActivity() {
         setContentView(R.layout.activity_comments)
 
         val postId = intent.getStringExtra("postId") ?: return
+        val commentId=intent.getStringExtra("commentId")?: return
 
         commentsAdapter = CommentsAdapter(commentsList)
         findViewById<RecyclerView>(R.id.commentsRecycler).apply {
@@ -36,9 +40,7 @@ class CommentsActivity : AppCompatActivity() {
 
         loadComments(postId, commentsAdapter)
 
-        findViewById<Button>(R.id.buttonAddComment).setOnClickListener {
-            showAddCommentDialog(postId)
-        }
+
     }
 
     private fun showAddCommentDialog(postId: String) {
@@ -93,4 +95,5 @@ class CommentsActivity : AppCompatActivity() {
                 }
             }
     }
+
 }

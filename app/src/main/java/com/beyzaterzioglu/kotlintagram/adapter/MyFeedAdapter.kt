@@ -25,21 +25,27 @@ import com.bumptech.glide.Glide
 import com.google.firebase.firestore.FirebaseFirestore
 import com.google.firebase.firestore.Query
 import de.hdodenhof.circleimageview.CircleImageView
+import org.w3c.dom.Text
 import java.util.Date
 
 interface OnCommentButtonClickListener {
     fun onCommentButtonClick(feed: Feed)
+}
+interface OnSubCommentButtonClickListener {
+    fun onSubCommentButtonClick(feed: Feed)
 }
 class MyFeedAdapter : RecyclerView.Adapter<FeedHolder>(){
 
 
 
     var onCommentClickListener: ((String) -> Unit)? = null
+    var onSubCommentClickListener:((String) -> Unit)? = null
 
     var feedList= listOf<Feed>()
     private var listener : onDoubleTappyClickListener?= null
     private var doubleTapListener: OnDoubleTapListener? = null
     private var commentButtonListener: OnCommentButtonClickListener? = null
+    private var onSubCommentButtonClick: OnSubCommentButtonClickListener? = null
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): FeedHolder {
         val view= LayoutInflater.from(parent.context).inflate(R.layout.feeditem,parent,false)
         return FeedHolder(view)
@@ -49,11 +55,13 @@ class MyFeedAdapter : RecyclerView.Adapter<FeedHolder>(){
         return feedList.size
     }
 
-    @SuppressLint("SetTextI18n")
+    @SuppressLint("SetTextI18n", "ClickableViewAccessibility")
     override fun onBindViewHolder(holder: FeedHolder, position: Int) {
         //postun detayları
         val feed=feedList[position]
-
+        var commentsAdapter = CommentsAdapter(emptyList())
+        holder.commentsRecyclerView.adapter = commentsAdapter
+        holder.commentsRecyclerView.layoutManager = LinearLayoutManager(holder.itemView.context)
         val boldText = "<b>${feed.username}</b>"
         val additionalText = ": ${feed.caption}"
         val combinedText = boldText + additionalText
@@ -68,6 +76,7 @@ class MyFeedAdapter : RecyclerView.Adapter<FeedHolder>(){
             DateUtils.MINUTE_IN_MILLIS,
             DateUtils.FORMAT_ABBREV_RELATIVE
         )
+
         holder.time.setText(instagramTimeFormat)
         holder.userNamePoster.setText(feed.username)
 
@@ -75,8 +84,9 @@ class MyFeedAdapter : RecyclerView.Adapter<FeedHolder>(){
         Glide.with(holder.itemView.context).load(feed.imageposter).into(holder.userPosterImage) //post atanın minik resmi
 
         holder.likecount.setText("${feed.likes} Likes")
+        holder.onSubCommentClickListener = onSubCommentClickListener
+        commentsAdapter.onSubCommentClickListener = onSubCommentClickListener
 
-        var commentsAdapter = CommentsAdapter(emptyList())
 
         holder.commentsRecyclerView.adapter = commentsAdapter
         holder.commentsRecyclerView.layoutManager = LinearLayoutManager(holder.itemView.context)
@@ -89,7 +99,9 @@ class MyFeedAdapter : RecyclerView.Adapter<FeedHolder>(){
                 return true
             }
         })
-
+     /*   holder.addSubCommentButton.setOnClickListener {
+            onCommentClickListener?.invoke(feed.postid!!)
+        } */
         holder.itemView.setOnTouchListener{_,event ->
             doubleClickGestureDetector.onTouchEvent(event)
             true
@@ -98,7 +110,11 @@ class MyFeedAdapter : RecyclerView.Adapter<FeedHolder>(){
             //commentButtonListener?.onCommentButtonClick(feed)
             onCommentClickListener?.invoke(feed.postid!!)
         }
+
+
     }
+
+
 
     fun updateFeedList(list: List<Feed>)
     {
@@ -127,11 +143,33 @@ class MyFeedAdapter : RecyclerView.Adapter<FeedHolder>(){
                 }
             }
     }
+  /*  fun loadSubComments(postId: String, commentsAdapter: CommentsAdapter) {
+        val firestore = FirebaseFirestore.getInstance()
+        firestore.collection("Posts").document(postId).collection("comments")
+            .document(commentId).collection("subcomments")
+            .orderBy("timestamp", Query.Direction.ASCENDING)
+            .addSnapshotListener { snapshot, e ->
+                if (e != null) {
+                    Log.w("LoadComments", "Listen failed.", e)
+                    return@addSnapshotListener
+                }
 
+                if (snapshot != null) {
+                    val commentsList = snapshot.toObjects(Comments::class.java)
+                    commentsAdapter.updateComments(commentsList)
+                    commentsAdapter.notifyDataSetChanged()
+                }
+            }
+    }
+
+   */
 
 }
 class FeedHolder(itemView: View): ViewHolder(itemView)
 { //RecyclerView içindeki bir öğenin görünümünü temsil eder.
+
+    var onSubCommentClickListener: ((String) -> Unit)? = null
+
     val userNamePoster : TextView = itemView.findViewById(R.id.feedtopusername)
     val userNameCaption : TextView = itemView.findViewById(R.id.feedusernamecaption)
     val commentsRecyclerView : RecyclerView = itemView.findViewById(R.id.commentsRecycler)
@@ -141,7 +179,7 @@ class FeedHolder(itemView: View): ViewHolder(itemView)
     val time: TextView = itemView.findViewById(R.id.feedtime)
     val likecount: TextView = itemView.findViewById(R.id.likecount)
     val addCommentButton: Button = itemView.findViewById(R.id.commentbutton)
-
+  //  val addSubCommentButton: Button = itemView.findViewById(R.id.answerCommentButton)
 }
 
 interface onDoubleTappyClickListener{

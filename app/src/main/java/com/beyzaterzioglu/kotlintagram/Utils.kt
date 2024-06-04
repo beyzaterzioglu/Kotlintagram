@@ -3,7 +3,7 @@ package com.beyzaterzioglu.kotlintagram
 import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.auth.ktx.oAuthCredential
 
-//2 nisan
+
 class Utils {
 
     companion object{

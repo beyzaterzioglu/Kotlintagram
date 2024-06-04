@@ -50,6 +50,7 @@ class CreatePostFragment : Fragment() {
     private var uri: Uri? = null
     private lateinit var firestore : FirebaseFirestore
 
+
     private lateinit var bitmap: Bitmap
     var postid : String =""
     var imageUserPoster: String = ""
@@ -63,13 +64,28 @@ class CreatePostFragment : Fragment() {
         // Inflate the layout for this fragment
         binding = DataBindingUtil.inflate(inflater, R.layout.fragment_create_post, container, false)
 
+
+        handleGalleryPermission()
         handleCameraPermission()
         return binding.root
 
     }
-
+    private val galleryPermissionRequestLauncher: ActivityResultLauncher<String> =
+        registerForActivityResult(ActivityResultContracts.RequestPermission())
+    { isGranted: Boolean ->
+        if (isGranted) {
+            pickImageFromGallery()
+        } else {
+            Toast.makeText(
+                requireContext(),
+                "Galeri erişim izni gerekiyor. Lütfen ayarlardan izin verin.",
+                Toast.LENGTH_SHORT
+            ).show()
+        }
+    }
     private val cameraPermissionRequestLauncher: ActivityResultLauncher<String> =
-        registerForActivityResult(ActivityResultContracts.RequestPermission()) { isGranted: Boolean ->
+        registerForActivityResult(ActivityResultContracts.RequestPermission())
+        { isGranted: Boolean ->
             if (isGranted) {
                 // Permission granted: proceed with opening the camera
                 //startDefaultCamera()
@@ -98,6 +114,39 @@ class CreatePostFragment : Fragment() {
                 cameraPermissionRequestLauncher.launch(Manifest.permission.CAMERA)
             }
         }
+    }
+   fun handleGalleryPermission() {
+        when {
+            ContextCompat.checkSelfPermission(
+                requireContext(),
+                Manifest.permission.READ_EXTERNAL_STORAGE
+            ) == PackageManager.PERMISSION_GRANTED -> {
+                // Permission is already granted
+                pickImageFromGallery()
+            }
+            shouldShowRequestPermissionRationale(Manifest.permission.READ_EXTERNAL_STORAGE) -> {
+                // Show an explanation to the user why the permission is necessary
+                showPermissionRationale()
+           }
+            else -> {
+                // Request the permission
+                galleryPermissionRequestLauncher.launch(Manifest.permission.READ_EXTERNAL_STORAGE)
+            }
+        }
+    }
+    private fun showPermissionRationale() {
+        AlertDialog.Builder(requireContext())
+            .setTitle("Galeri Erişim İzni")
+            .setMessage("Bu özellik için galeri erişim izni gerekiyor.")
+            .setPositiveButton("Tamam") { dialog, _ ->
+                galleryPermissionRequestLauncher.launch(Manifest.permission.READ_EXTERNAL_STORAGE)
+                dialog.dismiss()
+            }
+            .setNegativeButton("İptal") { dialog, _ ->
+                dialog.dismiss()
+            }
+            .create()
+            .show()
     }
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
@@ -196,7 +245,7 @@ class CreatePostFragment : Fragment() {
 
 
 
-    @SuppressLint("QueryPermissionsNeeded")
+   @SuppressLint("QueryPermissionsNeeded")
     private fun pickImageFromGallery() {
 
         val pickPictureIntent =
