@@ -20,7 +20,7 @@ class SignUpAc : AppCompatActivity() {
     private lateinit var binding: ActivitySignUpBinding
     private lateinit var auth: FirebaseAuth
     private  lateinit var pd: ProgressDialog
-    private lateinit var firestore: FirebaseFirestore // kullanıcıları burada depolarised
+    private lateinit var firestore: FirebaseFirestore // kullanıcıları burada depolar
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -60,7 +60,7 @@ class SignUpAc : AppCompatActivity() {
             {
                 val user=auth.currentUser
                 //varsayılan değerler
-                val hashMap= hashMapOf("userid" to user!!.uid,"username" to name,"image" to "https://upload.wikimedia.org/wikipedia/en/b/bd/Doraemon_character.png", //default resim link eklencek buraya,
+                val hashMap= hashMapOf("userid" to user!!.uid,"username" to name,"image" to "https://firebasestorage.googleapis.com/v0/b/kotlintagram.appspot.com/o/Photos%2Fblank-profile-picture-973460_960_720.webp?alt=media&token=ef89a47e-357a-4376-8e11-c58e206ce98f", //default resim link eklencek buraya,
                     "email" to email,"followers" to 0,"following" to 0 )
 
                 firestore.collection("Users").document(user.uid).set(hashMap)

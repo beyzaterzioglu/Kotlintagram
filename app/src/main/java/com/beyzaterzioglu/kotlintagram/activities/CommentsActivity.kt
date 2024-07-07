@@ -25,6 +25,7 @@ class CommentsActivity : AppCompatActivity() {
     private lateinit var commentsAdapter: CommentsAdapter
     private val commentsList = mutableListOf<Comments>()
 
+
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_comments)

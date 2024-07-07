@@ -30,6 +30,9 @@
         <action
             android:id="@+id/action_homeFrag_to_fragment_fullcomments"
             app:destination="@id/fragment_fullcomments" />
+        <action
+            android:id="@+id/action_homeFrag_to_commentsFragment"
+            app:destination="@id/commentsFragment" />
     </fragment>
     <fragment
         android:id="@+id/createPostFragment"
@@ -53,6 +56,14 @@
         android:label="FullCommentsFrag" >
         <action
             android:id="@+id/action_fragment_fullcomments_to_homeFrag"
+            app:destination="@id/homeFrag" />
+    </fragment>
+    <fragment
+        android:id="@+id/commentsFragment"
+        android:name="com.beyzaterzioglu.kotlintagram.fragments.CommentsFragment"
+        android:label="CommentsFragment" >
+        <action
+            android:id="@+id/action_commentsFragment_to_homeFrag"
             app:destination="@id/homeFrag" />
     </fragment>
 </navigation>

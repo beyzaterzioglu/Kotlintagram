@@ -11,6 +11,7 @@ import com.beyzaterzioglu.kotlintagram.R
 import com.beyzaterzioglu.kotlintagram.modal.Comments
 import org.w3c.dom.Comment
 
+
 import java.text.DateFormat
 
 import java.text.SimpleDateFormat
@@ -23,9 +24,9 @@ class CommentsAdapter(
     var onSubCommentClickListener: ((String) -> Unit)? = null
 
     class CommentViewHolder(itemView: View) : RecyclerView.ViewHolder(itemView) {
-        val userName: TextView = itemView.findViewById(R.id.userName)
-        val commentText: TextView = itemView.findViewById(R.id.commentText)
-        val timestamp: TextView = itemView.findViewById(R.id.timestamp)
+        val userName: TextView = itemView.findViewById(R.id.textViewUsername)
+        val commentText: TextView = itemView.findViewById(R.id.textViewComment)
+        val timestamp: TextView = itemView.findViewById(R.id.textViewtime)
         val addSubCommentButton: TextView = itemView.findViewById(R.id.answerCommentButton)
 
         init {

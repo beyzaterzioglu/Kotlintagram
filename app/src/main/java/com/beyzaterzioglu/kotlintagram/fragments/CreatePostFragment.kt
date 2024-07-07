@@ -13,9 +13,7 @@ import android.graphics.Bitmap
 import android.net.Uri
 import android.os.Bundle
 import android.provider.MediaStore
-import android.provider.MediaStore.ACTION_IMAGE_CAPTURE
 import android.util.Log
-import androidx.fragment.app.Fragment
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
@@ -25,72 +23,63 @@ import androidx.activity.result.contract.ActivityResultContracts
 import androidx.appcompat.app.AlertDialog
 import androidx.core.content.ContextCompat
 import androidx.databinding.DataBindingUtil
+import androidx.fragment.app.Fragment
 import androidx.lifecycle.Observer
 import androidx.lifecycle.ViewModelProvider
 import androidx.navigation.findNavController
-import com.beyzaterzioglu.kotlintagram.mvvm.ViewModel
 import com.beyzaterzioglu.kotlintagram.R
 import com.beyzaterzioglu.kotlintagram.Utils
 import com.beyzaterzioglu.kotlintagram.databinding.FragmentCreatePostBinding
+import com.beyzaterzioglu.kotlintagram.mvvm.ViewModel
 import com.google.firebase.firestore.FirebaseFirestore
 import com.google.firebase.storage.FirebaseStorage
 import com.google.firebase.storage.StorageReference
 import java.io.ByteArrayOutputStream
-import java.util.ArrayList
-import java.util.UUID
-
-
+import java.util.*
 
 class CreatePostFragment : Fragment() {
-    private lateinit var binding : FragmentCreatePostBinding
+    private lateinit var binding: FragmentCreatePostBinding
     private lateinit var pd: ProgressDialog
-    private lateinit var vm : ViewModel
+    private lateinit var vm: ViewModel
     private lateinit var storageRef: StorageReference
     private lateinit var storage: FirebaseStorage
     private var uri: Uri? = null
-    private lateinit var firestore : FirebaseFirestore
-
+    private lateinit var firestore: FirebaseFirestore
 
     private lateinit var bitmap: Bitmap
-    var postid : String =""
+    var postid: String = ""
     var imageUserPoster: String = ""
     var nameUserPoster: String = ""
-
 
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?,
         savedInstanceState: Bundle?
     ): View? {
-        // Inflate the layout for this fragment
         binding = DataBindingUtil.inflate(inflater, R.layout.fragment_create_post, container, false)
 
-
-        handleGalleryPermission()
-        handleCameraPermission()
         return binding.root
-
     }
+
     private val galleryPermissionRequestLauncher: ActivityResultLauncher<String> =
         registerForActivityResult(ActivityResultContracts.RequestPermission())
-    { isGranted: Boolean ->
-        if (isGranted) {
-            pickImageFromGallery()
-        } else {
-            Toast.makeText(
-                requireContext(),
-                "Galeri erişim izni gerekiyor. Lütfen ayarlardan izin verin.",
-                Toast.LENGTH_SHORT
-            ).show()
+        { isGranted: Boolean ->
+            if (isGranted) {
+                pickImageFromGallery()
+            } else {
+                Toast.makeText(
+                    requireContext(),
+                    "Galeri erişim izni gerekiyor. Lütfen ayarlardan izin verin.",
+                    Toast.LENGTH_SHORT
+                ).show()
+            }
         }
-    }
+
     private val cameraPermissionRequestLauncher: ActivityResultLauncher<String> =
         registerForActivityResult(ActivityResultContracts.RequestPermission())
         { isGranted: Boolean ->
             if (isGranted) {
-                // Permission granted: proceed with opening the camera
-                //startDefaultCamera()
+                takePhotoWithCamera()
             } else {
-                // Permission denied: inform the user to enable it through settings
                 Toast.makeText(
                     requireContext(),
                     "Go to settings and enable camera permission to use this feature",
@@ -99,41 +88,55 @@ class CreatePostFragment : Fragment() {
             }
         }
 
-    fun handleCameraPermission() {
+    private val galleryResultLauncher: ActivityResultLauncher<Intent> =
+        registerForActivityResult(ActivityResultContracts.StartActivityForResult()) { result ->
+            if (result.resultCode == Activity.RESULT_OK && result.data != null) {
+                val imageUri = result.data!!.data
+                val imageBitmap =
+                    MediaStore.Images.Media.getBitmap(context?.contentResolver, imageUri)
+                uploadImageToFirebaseStorage(imageBitmap)
+            }
+        }
+
+    private val cameraResultLauncher: ActivityResultLauncher<Intent> =
+        registerForActivityResult(ActivityResultContracts.StartActivityForResult()) { result ->
+            if (result.resultCode == Activity.RESULT_OK && result.data != null) {
+                val imageBitmap = result.data!!.extras?.get("data") as Bitmap
+                uploadImageToFirebaseStorage(imageBitmap)
+            }
+        }
+
+    private fun handleCameraPermission() {
         when {
             ContextCompat.checkSelfPermission(
                 requireContext(),
                 Manifest.permission.CAMERA
             ) == PackageManager.PERMISSION_GRANTED -> {
-                // Permission is already granted: start the camera
-                //startDefaultCamera()
+                takePhotoWithCamera()
             }
-
             else -> {
-                // Permission is not granted: request it
                 cameraPermissionRequestLauncher.launch(Manifest.permission.CAMERA)
             }
         }
     }
-   fun handleGalleryPermission() {
+
+    private fun handleGalleryPermission() {
         when {
             ContextCompat.checkSelfPermission(
                 requireContext(),
                 Manifest.permission.READ_EXTERNAL_STORAGE
             ) == PackageManager.PERMISSION_GRANTED -> {
-                // Permission is already granted
                 pickImageFromGallery()
             }
             shouldShowRequestPermissionRationale(Manifest.permission.READ_EXTERNAL_STORAGE) -> {
-                // Show an explanation to the user why the permission is necessary
                 showPermissionRationale()
-           }
+            }
             else -> {
-                // Request the permission
                 galleryPermissionRequestLauncher.launch(Manifest.permission.READ_EXTERNAL_STORAGE)
             }
         }
     }
+
     private fun showPermissionRationale() {
         AlertDialog.Builder(requireContext())
             .setTitle("Galeri Erişim İzni")
@@ -152,13 +155,9 @@ class CreatePostFragment : Fragment() {
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
 
-
-
         vm = ViewModelProvider(this).get(ViewModel::class.java)
 
-
         postid = UUID.randomUUID().toString()
-
 
         binding.lifecycleOwner = viewLifecycleOwner
 
@@ -166,58 +165,28 @@ class CreatePostFragment : Fragment() {
 
         firestore = FirebaseFirestore.getInstance()
 
-
         storage = FirebaseStorage.getInstance()
         storageRef = storage.reference
 
-
-
-
-        vm.name.observe(viewLifecycleOwner, Observer { it->
-
+        vm.name.observe(viewLifecycleOwner, Observer { it ->
             nameUserPoster = it!!
-
-
         })
 
-        vm.image.observe(viewLifecycleOwner, Observer { it->
-
+        vm.image.observe(viewLifecycleOwner, Observer { it ->
             imageUserPoster = it!!
-
-
         })
-
-
-
-
 
         binding.imageToPost.setOnClickListener {
-
-
             addPostDialog()
-
-
-
         }
 
         binding.postBtn.setOnClickListener {
-
-            var capti = binding.addCaption.text.toString()
+            val capti = binding.addCaption.text.toString()
 
             firestore.collection("Posts").document(postid).update("caption", capti)
 
             view.findNavController().navigate(R.id.action_createPostFragment_to_profileFrag)
-
-
-
-
-
         }
-
-
-
-
-
     }
 
     private fun addPostDialog() {
@@ -227,78 +196,34 @@ class CreatePostFragment : Fragment() {
         builder.setItems(options) { dialog, item ->
             when {
                 options[item] == "Take Photo" -> {
-
-                    takePhotoWithCamera()
-
-
+                    handleCameraPermission()
                 }
                 options[item] == "Choose from Gallery" -> {
-                    pickImageFromGallery()
+                    handleGalleryPermission()
                 }
                 options[item] == "Cancel" -> dialog.dismiss()
             }
         }
         builder.show()
-
-
     }
 
-
-
-   @SuppressLint("QueryPermissionsNeeded")
+    @SuppressLint("QueryPermissionsNeeded")
     private fun pickImageFromGallery() {
-
         val pickPictureIntent =
             Intent(Intent.ACTION_PICK, MediaStore.Images.Media.EXTERNAL_CONTENT_URI)
-        if (pickPictureIntent.resolveActivity(requireActivity().packageManager) != null) {
-            startActivityForResult(pickPictureIntent, Utils.REQUEST_IMAGE_PICK)
-        }
+        galleryResultLauncher.launch(pickPictureIntent)
     }
-
 
     @SuppressLint("QueryPermissionsNeeded")
     private fun takePhotoWithCamera() {
-
-
         val takePictureIntent = Intent(MediaStore.ACTION_IMAGE_CAPTURE)
-        startActivityForResult(takePictureIntent, Utils.REQUEST_IMAGE_CAPTURE)
-
-
+        cameraResultLauncher.launch(takePictureIntent)
     }
-
-
-    @Deprecated("Deprecated in Java")
-    override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {
-        super.onActivityResult(requestCode, resultCode, data)
-
-
-
-        if (resultCode == Activity.RESULT_OK) {
-            when (requestCode) {
-                Utils.REQUEST_IMAGE_CAPTURE -> {
-                    val imageBitmap = data?.extras?.get("data") as Bitmap
-
-                    uploadImageToFirebaseStorage(imageBitmap)
-                }
-                Utils.REQUEST_IMAGE_PICK -> {
-                    val imageUri = data?.data
-                    val imageBitmap =
-                        MediaStore.Images.Media.getBitmap(context?.contentResolver, imageUri)
-                    uploadImageToFirebaseStorage(imageBitmap)
-                }
-            }
-        }
-
-    }
-
 
     private fun uploadImageToFirebaseStorage(imageBitmap: Bitmap?) {
-
-
         val baos = ByteArrayOutputStream()
         imageBitmap?.compress(Bitmap.CompressFormat.JPEG, 100, baos)
         val data = baos.toByteArray()
-
 
         bitmap = imageBitmap!!
 
@@ -307,27 +232,11 @@ class CreatePostFragment : Fragment() {
         val storagePath = storageRef.child("Photos/${UUID.randomUUID()}.jpg")
         val uploadTask = storagePath.putBytes(data)
 
-
         uploadTask.addOnSuccessListener {
-
-
             val task = it.metadata?.reference?.downloadUrl
 
-            task?.addOnSuccessListener {
-
-                uri = it
-
-
-
+            task?.addOnSuccessListener { uri ->
                 postImage(uri)
-
-
-
-
-
-
-
-
             }
             Toast.makeText(context, "Image uploaded successfully!", Toast.LENGTH_SHORT).show()
         }.addOnFailureListener {
@@ -335,22 +244,21 @@ class CreatePostFragment : Fragment() {
         }
     }
 
-
-
     private fun postImage(uri: Uri?) {
-
-
-
         val likers = ArrayList<String>() // Create an empty ArrayList as the initial value
 
-        val hashMap = hashMapOf<Any, Any>("image" to uri.toString(), "postid" to postid, "userid" to Utils.getUiLoggedIn(), "likers" to likers,
-            "time" to Utils.getTime(), "caption" to "default", "likes" to 0,
-            "username" to nameUserPoster, "imageposter" to imageUserPoster)
+        val hashMap = hashMapOf<Any, Any>(
+            "image" to uri.toString(),
+            "postid" to postid,
+            "userid" to Utils.getUiLoggedIn(),
+            "likers" to likers,
+            "time" to Utils.getTime(),
+            "caption" to "default",
+            "likes" to 0,
+            "username" to nameUserPoster,
+            "imageposter" to imageUserPoster
+        )
 
         firestore.collection("Posts").document(postid).set(hashMap)
-
-
     }
-
-
 }

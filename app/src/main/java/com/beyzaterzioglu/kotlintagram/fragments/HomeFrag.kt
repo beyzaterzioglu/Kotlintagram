@@ -15,6 +15,7 @@ import androidx.databinding.DataBindingUtil
 import androidx.lifecycle.Observer
 import androidx.lifecycle.ViewModelProvider
 import androidx.navigation.findNavController
+import androidx.navigation.fragment.findNavController
 import androidx.recyclerview.widget.LinearLayoutManager
 import com.beyzaterzioglu.kotlintagram.R
 import com.beyzaterzioglu.kotlintagram.Utils
@@ -51,6 +52,8 @@ class HomeFrag : Fragment(), onDoubleTappyClickListener {
         val addCommentButton = view.findViewById<Button>(R.id.buttonAddComment)
         val addSubCommentButton = view.findViewById<Button>(R.id.answerCommentButton)
         val commentEditText = view.findViewById<EditText>(R.id.editTextComment)
+
+
 
         adapter = MyFeedAdapter().apply {
             setListener(this@HomeFrag)
@@ -90,7 +93,8 @@ class HomeFrag : Fragment(), onDoubleTappyClickListener {
         }
 
 
-        vm.image.observe(viewLifecycleOwner, Observer {
+
+            vm.image.observe(viewLifecycleOwner, Observer {
             Glide.with(requireContext()).load(it).into(binding.imageViewBottom)
         })
 
@@ -107,6 +111,10 @@ class HomeFrag : Fragment(), onDoubleTappyClickListener {
         // Yorumlar RecyclerView'u ve Adapter'i ayarlayın
 
 
+    }
+    //yeni
+    fun AllCommentButtonClick(view: View) {
+        // Metodun içeriği buraya gelecek
     }
 
     private fun showAddCommentDialog(postId: String) {

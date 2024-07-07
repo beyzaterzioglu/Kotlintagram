@@ -16,9 +16,9 @@
         android:allowBackup="true"
         android:dataExtractionRules="@xml/data_extraction_rules"
         android:fullBackupContent="@xml/backup_rules"
-        android:icon="@mipmap/instagram"
+        android:icon="@drawable/camera"
         android:label="Kotlintagram"
-        android:roundIcon="@mipmap/instagram"
+        android:roundIcon="@drawable/camera"
         android:supportsRtl="true"
         android:theme="@style/Theme.MaterialComponents.Light.NoActionBar"
         tools:targetApi="31">

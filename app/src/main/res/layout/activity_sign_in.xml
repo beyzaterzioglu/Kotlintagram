@@ -20,7 +20,7 @@
                 android:layout_width="150dp"
                 android:layout_height="150dp"
                 android:layout_marginBottom="20dp"
-                android:src="@drawable/kotlin"/>
+                android:src="@drawable/camera"/>
 
             <TextView
                 android:layout_width="wrap_content"

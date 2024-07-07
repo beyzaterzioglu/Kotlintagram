@@ -7,6 +7,7 @@ data class Comments(
     val userName: String = "",
     val commentId : String=" ",
     val commentText: String = "",
+   // val profileImageUrl: String, // Profil resmi URL'si
     val timestamp: Timestamp = Timestamp.now(),
     val subComments: MutableList<SubComment> = mutableListOf()
 )

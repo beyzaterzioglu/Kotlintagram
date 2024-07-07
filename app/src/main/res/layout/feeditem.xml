@@ -124,18 +124,7 @@
 
         </LinearLayout>
 
-        <TextView
-            android:id="@+id/showItem"
-            android:layout_width="match_parent"
-            android:layout_height="40dp"
-            android:layout_margin="12dp"
-            android:background="@color/white"
-            android:onClick="AllCommentButtonClick"
-            android:text="Show All Comments"
-            android:textColor="@color/black"
-            android:textStyle="bold"
-            android:clickable="true"
-            app:backgroundTint="@color/white" />
+
     </LinearLayout>
 
 </androidx.cardview.widget.CardView>
